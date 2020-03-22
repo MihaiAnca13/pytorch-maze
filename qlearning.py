@@ -45,12 +45,14 @@ class DQNAgent:
         minibatch = random.sample(self.replay_memory, MINIBATCH_SIZE)
 
         # Get current states from minibatch, then query NN model for Q values
-        current_states = torch.Tensor([transition[0] for transition in minibatch]).view(-1, 1, self.size[0], self.size[1])
+        # current_states = torch.Tensor([transition[0] for transition in minibatch]).view(-1, 1, self.size[0], self.size[1])
+        current_states = torch.stack([transition[0] for transition in minibatch]).to(self.model.device).view(-1, 1, self.size[0], self.size[1])
         current_qs_list = self.model(current_states).cpu().detach().numpy()
 
         # Get future states from minibatch, then query NN model for Q values
         # When using target network, query it, otherwise main network should be queried
-        new_current_states = torch.Tensor([transition[3] for transition in minibatch]).view(-1, 1, self.size[0], self.size[1])
+        # new_current_states = torch.Tensor([transition[3] for transition in minibatch]).view(-1, 1, self.size[0], self.size[1])
+        new_current_states = torch.stack([transition[3] for transition in minibatch]).to(self.model.device).view(-1, 1, self.size[0], self.size[1])
         future_qs_list = self.target_model(new_current_states).cpu().detach().numpy()
 
         X = []
@@ -76,10 +78,10 @@ class DQNAgent:
             y.append(current_qs)
 
         # Fit on all samples as one batch, log only on terminal state
-        inps = torch.Tensor(X).view(-1, 1, self.size[0], self.size[1])
+        inps = torch.stack(X).view(-1, 1, self.size[0], self.size[1])
         outs = torch.Tensor(y)
 
-        self.model.batch_train(inps, outs, batch_size=MINIBATCH_SIZE, epochs=1)
+        self.model.simple_train(inps, outs)
 
         # Update target network counter every episode
         if terminal_state:
@@ -90,6 +92,7 @@ class DQNAgent:
             self.target_model.load_state_dict(self.model.state_dict())
             self.target_update_counter = 0
 
+
     def get_qs(self, state):
         with torch.no_grad():
-            return self.model(torch.tensor(state).view(-1, 1, self.size[0], self.size[1])).cpu().detach().numpy()
+            return self.model(state.view(-1, 1, self.size[0], self.size[1])).cpu().detach().numpy()

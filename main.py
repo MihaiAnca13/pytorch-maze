@@ -1,4 +1,4 @@
-from maze import Maze
+from maze_tensor import Maze
 from qlearning import DQNAgent
 import numpy as np
 import random
@@ -6,7 +6,7 @@ import torch
 from tqdm import tqdm
 import time
 
-MODEL_NAME = "third-" + str(time.time())
+MODEL_NAME = "forth-" + str(time.time())
 
 open("models/" + MODEL_NAME + ".pt", "w")
 
@@ -32,7 +32,7 @@ SHOW_PREVIEW = True
 env = Maze(SIZE[0], SIZE[1])
 # env.show_maze()
 
-agent = DQNAgent(size=SIZE)
+agent = DQNAgent(size=SIZE, load="models/third-1584882526.6632633.pt")
 
 # Iterate over episodes
 for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):

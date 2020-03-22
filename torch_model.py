@@ -69,6 +69,15 @@ class TorchModel(nn.Module):
                 self.optimizer.step()
             # print(loss)
 
+    def simple_train(self, train_X, train_y):
+        train_X, train_y = train_X.to(self.device), train_y.to(self.device)
+
+        self.zero_grad()
+        outputs = self(train_X)
+        loss = self.loss_function(outputs, train_y)
+        loss.backward()
+        self.optimizer.step()
+
 
 if __name__ == "__main__":
     from maze import Maze

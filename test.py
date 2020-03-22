@@ -1,4 +1,4 @@
-from maze import Maze
+from maze_tensor import Maze
 from qlearning import DQNAgent
 import numpy as np
 import random
@@ -10,7 +10,7 @@ EPISODES = 1
 
 env = Maze(SIZE[0], SIZE[1])
 
-agent = DQNAgent(size=SIZE, load="models/first-1584700524.8551683.pt")
+agent = DQNAgent(size=SIZE, load="models/third-1584882526.6632633.pt")
 
 # Iterate over episodes
 for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
@@ -27,9 +27,9 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
 
         # This part stays mostly the same, the change is to query a model for Q values
         action = np.argmax(agent.get_qs(current_state))
-        print(action)
+        # print(action)
 
-        current_state, reward, done = env.step(action, step, show=True, delay=0)
+        current_state, reward, done = env.step(action, 0, show=True)
 
         episode_reward += reward
 
